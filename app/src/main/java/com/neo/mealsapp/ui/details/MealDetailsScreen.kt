@@ -7,6 +7,9 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -25,13 +28,13 @@ import kotlin.math.min
 
 @Composable
 fun MealsDetailsScreen(meal: MealResponse?) {
-    // to make column scrollable
-    val scrollState = rememberScrollState()
+    // to rememeber scroll state in lazy list
+    val scrollState = rememberLazyListState()
 
-    // scroll state value increases when scrolled
+    // offset bigger when user scrolls up since -ve - -ve is +ve with max offset value of 1f
     val offset = min(
         1f,
-        1 - (scrollState.value / 600f) // offset bigger when user scrolls up since -ve - -ve is +ve with max offset value of 1f
+        1 - (scrollState.firstVisibleItemScrollOffset / 600f + scrollState.firstVisibleItemIndex)  // 2nd param will only be smaller for  only first element, making ImageView bigger
     )
     val size by animateDpAsState(
         targetValue = max(
@@ -68,19 +71,12 @@ fun MealsDetailsScreen(meal: MealResponse?) {
                 }
             }
 
-            Column(modifier = Modifier.verticalScroll(scrollState)) {
-                Text("This is text element", modifier = Modifier.padding(32.dp))
-                Text("This is text element", modifier = Modifier.padding(32.dp))
-                Text("This is text element", modifier = Modifier.padding(32.dp))
-                Text("This is text element", modifier = Modifier.padding(32.dp))
-                Text("This is text element", modifier = Modifier.padding(32.dp))
-                Text("This is text element", modifier = Modifier.padding(32.dp))
-                Text("This is text element", modifier = Modifier.padding(32.dp))
-                Text("This is text element", modifier = Modifier.padding(32.dp))
-                Text("This is text element", modifier = Modifier.padding(32.dp))
-                Text("This is text element", modifier = Modifier.padding(32.dp))
-                Text("This is text element", modifier = Modifier.padding(32.dp))
-                Text("This is text element", modifier = Modifier.padding(32.dp))
+
+            val dummyContentList = (0..100).map{it.toString()}
+            LazyColumn(state = scrollState) {
+                items(dummyContentList){dummyItem ->
+                    Text(text=dummyItem, modifier = Modifier.padding(24.dp))
+                }
             }
         }
     }
