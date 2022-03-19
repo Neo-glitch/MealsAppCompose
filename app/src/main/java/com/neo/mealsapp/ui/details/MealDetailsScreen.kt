@@ -6,87 +6,85 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.neo.mealsapp.model.response.MealResponse
+import kotlin.math.min
 
 @Composable
 fun MealsDetailsScreen(meal: MealResponse?) {
-    // for animate single component
-//    var isExpanded by remember { mutableStateOf(false) }
-//    // state that does animation when changing it's dp value
-//    val imageSizeDp: Dp by animateDpAsState(
-//        targetValue = if (isExpanded) 200.dp else 100.dp
-//    )
+    // to make column scrollable
+    val scrollState = rememberScrollState()
 
-    // for animating multiple components
-    var profilePictureState by remember {
-        mutableStateOf(MealProfilePictureState.Normal)
-    }
-    // handles transition anim from one state to another
-    var transition = updateTransition(targetState = profilePictureState, label = "")
-    val imageSizeDp by transition.animateDp(targetValueByState = {
-        it.size  // returns this to imageSizeDp
-    }, label = "")
-    val color by transition.animateColor(label = "") {
-        it.color
-    }
-    val widthSize by transition.animateDp(targetValueByState = { it.borderWith }, label = "")
+    // scroll state value increases when scrolled
+    val offset = min(
+        1f,
+        1 - (scrollState.value / 600f) // offset bigger when user scrolls up since -ve - -ve is +ve with max offset value of 1f
+    )
+    val size by animateDpAsState(
+        targetValue = max(
+            // 100.dp is min size image will be when we are scrolling down
+            100.dp, 200.dp * offset)
+    )
+    Surface(color = MaterialTheme.colors.background) {
+        Column {
 
-
-
-
-    Column {
-        Row() {
-            Card(
-                modifier = Modifier.padding(16.dp),
-                shape = CircleShape,
-                border = BorderStroke(width = widthSize, color = color)
-            ) {
-                Image(
-                    painter = rememberImagePainter(meal?.imageUrl,
-                        builder = {
-                            transformations(CircleCropTransformation())
-                        }
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(imageSizeDp)
-                        .padding(8.dp)
-                )
+            Surface(elevation = 4.dp) { // acts as our custom toolbar using elevation attr
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Card(
+                        modifier = Modifier.padding(16.dp),
+                        shape = CircleShape,
+                        border = BorderStroke(width = 2.dp, color = Color.Green)
+                    ) {
+                        Image(
+                            painter = rememberImagePainter(meal?.imageUrl,
+                                builder = {
+                                    transformations(CircleCropTransformation())
+                                }
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(size)
+                        )
+                    }
+                    Text(
+                        text = meal?.name ?: "default name",
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                }
             }
-            Text(
-                text = meal?.name ?: "default name",
-                modifier = Modifier
-                    .padding(16.dp)
-                    .align(Alignment.CenterVertically)
-            )
-        }
-        Button(modifier = Modifier.padding(16.dp),
-            onClick = {
-                profilePictureState = if (profilePictureState == MealProfilePictureState.Normal)
-                    MealProfilePictureState.Expanded
-                else
-                    MealProfilePictureState.Normal
-            }) {
-            Text("Change state of meal profile picture")
+
+            Column(modifier = Modifier.verticalScroll(scrollState)) {
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+                Text("This is text element", modifier = Modifier.padding(32.dp))
+            }
         }
     }
+
 }
 
 
